@@ -11,15 +11,12 @@ public class ATMInterface extends JFrame implements ActionListener {
     public ATMInterface() {
         super("ATM Interface");
 
-        // Input field
         inputField = new JTextField(10);
         inputField.addActionListener(this);
-
-        // Output area
+        
         outputArea = new JTextArea(10, 30);
         outputArea.setEditable(false);
 
-        // Buttons
         depositButton = new JButton("Deposit");
         depositButton.addActionListener(this);
         withdrawButton = new JButton("Withdraw");
@@ -31,7 +28,6 @@ public class ATMInterface extends JFrame implements ActionListener {
         clearHistoryButton = new JButton("Clear History");
         clearHistoryButton.addActionListener(this);
 
-        // Layout
         JPanel inputPanel = new JPanel(new FlowLayout());
         inputPanel.add(new JLabel("Enter amount:"));
         inputPanel.add(inputField);
