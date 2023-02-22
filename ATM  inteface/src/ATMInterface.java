@@ -10,10 +10,11 @@ public class ATMInterface extends JFrame implements ActionListener {
 
     public ATMInterface() {
         super("ATM Interface");
+        showLoginWindow();
 
         inputField = new JTextField(10);
         inputField.addActionListener(this);
-        
+
         outputArea = new JTextArea(10, 30);
         outputArea.setEditable(false);
 
@@ -51,6 +52,34 @@ public class ATMInterface extends JFrame implements ActionListener {
         setVisible(true);
     }
 
+    private void showLoginWindow() {
+        int attempts = 0;
+        while (attempts < 3) {
+            String input = JOptionPane.showInputDialog(this, "Enter your PIN:");
+            if (input == null) {
+           
+                break;
+            }
+            int pin = 0;
+            try {
+                pin = Integer.parseInt(input);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Invalid PIN format.");
+                continue;
+            }
+            if (pin == 1234) {
+                break;
+            } else {
+                attempts++;
+                JOptionPane.showMessageDialog(this, "Incorrect PIN. Attempts left: " + (3 - attempts));
+            }
+        }
+        if (attempts == 3) {
+            JOptionPane.showMessageDialog(this, "Your card is blocked.");
+            System.exit(0);
+        }
+    }
+
     public void actionPerformed(ActionEvent e) {
         String cmd = e.getActionCommand();
         String inputText = inputField.getText();
@@ -76,6 +105,8 @@ public class ATMInterface extends JFrame implements ActionListener {
                 }
             } catch (NumberFormatException ex) {
                 outputArea.append("Enter how much you want to withdraw\n");
+
+
             }
         } else if (cmd.equals("Balance")) {
             outputArea.append(String.format("Current balance: $%.2f\n", balance));
