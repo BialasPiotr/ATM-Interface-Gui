@@ -1,16 +1,21 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import javax.swing.*;
 
 public class ATMInterface extends JFrame implements ActionListener {
     private JTextField inputField;
     private JTextArea outputArea;
-    private JButton depositButton, withdrawButton, balanceButton, exitButton, clearHistoryButton;
+    private JButton depositButton;
+    private JButton balanceButton;
+    private JButton exitButton;
+    private JButton clearHistoryButton;
     private double balance = 0;
+    private ArrayList<Transaction> transactionList = new ArrayList<>();
 
     public ATMInterface() {
         super("ATM Interface");
-        showLoginWindow();
+        LoginWindow loginWindow = new LoginWindow(this);
 
         inputField = new JTextField(10);
         inputField.addActionListener(this);
@@ -20,7 +25,7 @@ public class ATMInterface extends JFrame implements ActionListener {
 
         depositButton = new JButton("Deposit");
         depositButton.addActionListener(this);
-        withdrawButton = new JButton("Withdraw");
+        JButton withdrawButton = new JButton("Withdraw");
         withdrawButton.addActionListener(this);
         balanceButton = new JButton("Balance");
         balanceButton.addActionListener(this);
@@ -52,67 +57,31 @@ public class ATMInterface extends JFrame implements ActionListener {
         setVisible(true);
     }
 
-    private void showLoginWindow() {
-        int attempts = 0;
-        while (attempts < 3) {
-            String input = JOptionPane.showInputDialog(this, "Enter your PIN:");
-            if (input == null) {
-           
-                break;
-            }
-            int pin = 0;
-            try {
-                pin = Integer.parseInt(input);
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Invalid PIN format.");
-                continue;
-            }
-            if (pin == 1234) {
-                break;
-            } else {
-                attempts++;
-                JOptionPane.showMessageDialog(this, "Incorrect PIN. Attempts left: " + (3 - attempts));
-            }
-        }
-        if (attempts == 3) {
-            JOptionPane.showMessageDialog(this, "Your card is blocked.");
-            System.exit(0);
-        }
-    }
-
     public void actionPerformed(ActionEvent e) {
-        String cmd = e.getActionCommand();
-        String inputText = inputField.getText();
-
-        if (cmd.equals("Deposit")) {
-            try {
-                double amount = Double.parseDouble(inputText);
-                balance += amount;
-                outputArea.append(String.format("Deposited $%.2f\n", amount));
-                inputField.setText("");
-            } catch (NumberFormatException ex) {
-                outputArea.append("Enter how much you want to Deposit\n");
+        if (e.getSource() == depositButton) {
+            double amount = Double.parseDouble(inputField.getText());
+            balance += amount;
+            Transaction transaction = new Transaction("Deposit", amount, balance);
+            transactionList.add(transaction);
+            outputArea.append(transaction.toString() + "\n");
+            inputField.setText("");
+        } else if (e.getActionCommand().equals("Withdraw")) {
+            double amount = Double.parseDouble(inputField.getText());
+            if (amount > balance) {
+                JOptionPane.showMessageDialog(this, "Insufficient funds.");
+            } else {
+                balance -= amount;
+                Transaction transaction = new Transaction("Withdrawal", amount, balance);
+                transactionList.add(transaction);
+                outputArea.append(transaction.toString() + "\n");
             }
-        } else if (cmd.equals("Withdraw")) {
-            try {
-                double amount = Double.parseDouble(inputText);
-                if (amount > balance) {
-                    outputArea.append("You do not have any funds in your account\n");
-                } else {
-                    balance -= amount;
-                    outputArea.append(String.format("Withdrew $%.2f\n", amount));
-                    inputField.setText("");
-                }
-            } catch (NumberFormatException ex) {
-                outputArea.append("Enter how much you want to withdraw\n");
-
-
-            }
-        } else if (cmd.equals("Balance")) {
-            outputArea.append(String.format("Current balance: $%.2f\n", balance));
-        } else if (cmd.equals("Clear History")) {
+            inputField.setText("");
+        } else if (e.getSource() == balanceButton) {
+            JOptionPane.showMessageDialog(this, String.format("Your current balance is: $%.2f", balance));
+        } else if (e.getSource() == clearHistoryButton) {
+            transactionList.clear();
             outputArea.setText("");
-        } else if (cmd.equals("Exit")) {
+        } else if (e.getSource() == exitButton) {
             System.exit(0);
         }
     }
