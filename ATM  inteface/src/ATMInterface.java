@@ -16,7 +16,6 @@ public class ATMInterface extends JFrame implements ActionListener {
     public ATMInterface() {
         super("ATM Interface");
         LoginWindow loginWindow = new LoginWindow(this);
-
         inputField = new JTextField(10);
         inputField.addActionListener(this);
 
